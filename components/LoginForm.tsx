@@ -5,73 +5,79 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const router = useRouter();
+    const router = useRouter();
+    const emailId = "login-email";
+    const passwordId = "login-password";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-  const [error, setError] = useState("");
+    const [error, setError] = useState("");
 
-  const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
 
-    setLoading(true);
-    setError("");
+        setLoading(true);
+        setError("");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+        const result = await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+        });
 
-    setLoading(false);
+        setLoading(false);
 
-    if (result?.error) {
-      setError("Invalid email or password");
-      return;
+        if (result?.error) {
+            setError("Invalid email or password");
+            return;
+        }
+
+        router.push("/dashboard");
+        router.refresh();
     }
 
-    router.push("/dashboard");
-    router.refresh();
-  }
+    return (
+        <form
+            onSubmit={handleSubmit}
+            className="space-y-5 rounded-xl bg-white p-6 shadow"
+        >
+            {error && (
+                <p className="rounded bg-red-100 p-2 text-red-600">{error}</p>
+            )}
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5 rounded-xl bg-white p-6 shadow"
-    >
-      {error && <p className="rounded bg-red-100 p-2 text-red-600">{error}</p>}
+            <div>
+                <label htmlFor={emailId}>Email</label>
 
-      <div>
-        <label>Email</label>
+                <input
+                    id={emailId}
+                    className="mt-1 w-full rounded border p-2"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+            </div>
 
-        <input
-          className="mt-1 w-full rounded border p-2"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
+            <div>
+                <label htmlFor={passwordId}>Password</label>
 
-      <div>
-        <label>Password</label>
+                <input
+                    id={passwordId}
+                    className="mt-1 w-full rounded border p-2"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </div>
 
-        <input
-          className="mt-1 w-full rounded border p-2"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-
-      <button
-        disabled={loading}
-        className="w-full rounded bg-blue-600 p-2 text-white"
-      >
-        {loading ? "Signing In..." : "Login"}
-      </button>
-    </form>
-  );
+            <button
+                disabled={loading}
+                className="w-full rounded bg-blue-600 p-2 text-white"
+            >
+                {loading ? "Signing In..." : "Login"}
+            </button>
+        </form>
+    );
 }
